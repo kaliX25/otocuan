@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "OTO CUAN",
+    "slug": "otocuan",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/brand/app_icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/brand/app_icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#EFFBFD"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "id.otocuan.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/brand/app_icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "id.otocuan.app"
+    },
+    "web": {
+      "favicon": "./assets/brand/app_icon.png",
+      "bundler": "metro",
+      "output": "single",
+      "name": "OTO CUAN",
+      "themeColor": "#0088A3"
+    },
+    "plugins": [
+      "expo-font",
+      "expo-asset"
+    ],
+    "scheme": "otocuan"
+  }
+}

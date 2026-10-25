@@ -1,0 +1,9 @@
+node_modules/
+mobile/dist/
+mobile/.expo/
+.env
+.env.*
+!.env.example
+__pycache__/
+.pytest_cache/
+.vercel/

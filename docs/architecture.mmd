@@ -1,0 +1,40 @@
+flowchart LR
+    subgraph Client["Client: React Native (Expo)"]
+        direction TB
+        UI["Screens\nOnboarding · Home · Keuangan · Target\nNabung Yuk · Planner · Kesiapan · Profil"]
+        State["App store + navigator\n(React context)"]
+        Engine["engine.ts\n(rules mirror for offline demo)"]
+        Local[("AsyncStorage /\nlocalStorage")]
+        UI --> State --> Engine
+        Engine --> Local
+    end
+
+    subgraph Vercel["Vercel project: otocuan"]
+        direction TB
+        Static["Static web build\nexpo export -p web\n(CDN)"]
+        Fn["Python serverless function\n/api/* → FastAPI"]
+        subgraph API["FastAPI backend"]
+            direction TB
+            Routes["Routes\n/state /finance /transactions\n/goals /deposits /scenarios\n/consultations /notifications"]
+            Svc["engine.py\nsisa aman · ETA target · simulasi\nstreak & latte · readiness"]
+            Store["SupabaseRestStore\n(user JWT + publishable key)\nPostgresStore · MemoryStore"]
+            Routes --> Svc --> Store
+        end
+        Fn --> Routes
+    end
+
+    subgraph Supabase["Supabase"]
+        direction TB
+        Auth["Auth\nOTP via SMS / email · JWT"]
+        DB[("Postgres\nRLS: user_id = auth.uid()")]
+    end
+
+    OTO["OTO Finance\ncabang · chat · telepon\n(only with user consent)"]
+
+    State -- "HTTPS + Bearer JWT" --> Fn
+    UI -- "signInWithOtp / verifyOtp" --> Auth
+    Browser(("Gen Z user\nAndroid · iOS · web")) --> UI
+    Browser -. "otocuan.vercel.app" .-> Static
+    Fn -- "verify session /auth/v1/user" --> Auth
+    Store -- "PostgREST + RPC (RLS enforced)" --> DB
+    Routes -- "consultation summary" --> OTO

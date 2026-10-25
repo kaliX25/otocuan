@@ -1,0 +1,108 @@
+erDiagram
+    AUTH_USERS ||--|| PROFILES : "1:1 (trigger)"
+    PROFILES ||--o{ CONSENTS : grants
+    PROFILES ||--|| FINANCE_PROFILES : has
+    PROFILES ||--o{ CATEGORY_BUDGETS : plans
+    EXPENSE_CATEGORIES ||--o{ CATEGORY_BUDGETS : "categorizes"
+    PROFILES ||--o{ GOALS : "owns (DP, dana cadangan)"
+    PROFILES ||--o{ TRANSACTIONS : records
+    EXPENSE_CATEGORIES ||--o{ TRANSACTIONS : "out tx"
+    GOALS ||--o{ TRANSACTIONS : "deposits"
+    PROFILES ||--|| GAMIFICATION_STATE : "latte & streak"
+    PROFILES ||--o{ USER_REWARDS : unlocks
+    REWARDS ||--o{ USER_REWARDS : "reward"
+    PROFILES ||--o{ REPAYMENT_SCENARIOS : saves
+    CALC_PARAMETERS ||--o{ REPAYMENT_SCENARIOS : "params_version"
+    PROFILES ||--o{ READINESS_SNAPSHOTS : computes
+    PROFILES ||--o{ CONSULTATION_REQUESTS : submits
+    PROFILES ||--o{ NOTIFICATIONS : receives
+    PROFILES ||--o{ REMINDER_SETTINGS : configures
+
+    AUTH_USERS { uuid id PK
+        text phone
+        text email }
+    PROFILES { uuid id PK
+        text full_name
+        text phone
+        text email
+        timestamptz delete_requested_at }
+    CONSENTS { bigint id PK
+        uuid user_id FK
+        consent_type type
+        bool granted
+        text version }
+    FINANCE_PROFILES { uuid user_id PK
+        bigint net_income
+        bigint essential_expense
+        bigint obligations
+        smallint payday_day }
+    EXPENSE_CATEGORIES { text code PK
+        text label
+        text color
+        bool is_essential }
+    CATEGORY_BUDGETS { uuid user_id PK
+        text category_code PK
+        bigint monthly_amount }
+    GOALS { uuid id PK
+        uuid user_id FK
+        goal_kind kind
+        vehicle_type vehicle
+        bigint vehicle_price
+        smallint dp_percent
+        smallint months_cover
+        bigint monthly_contribution
+        bigint saved_amount }
+    TRANSACTIONS { uuid id PK
+        uuid user_id FK
+        tx_type type
+        text category_code FK
+        uuid goal_id FK
+        bigint amount
+        bool via_nabung_yuk
+        date occurred_on }
+    GAMIFICATION_STATE { uuid user_id PK
+        int latte_total
+        int current_streak
+        int longest_streak
+        date last_saving_date }
+    REWARDS { text code PK
+        text title
+        int latte_required }
+    USER_REWARDS { uuid user_id PK
+        text reward_code PK
+        timestamptz unlocked_at
+        timestamptz redeemed_at }
+    REPAYMENT_SCENARIOS { uuid id PK
+        uuid user_id FK
+        bigint vehicle_price
+        smallint tenor_months
+        numeric flat_rate
+        text params_version
+        bigint monthly_payment
+        bigint cash_left
+        bool stress_test }
+    CALC_PARAMETERS { bigint id PK
+        text key
+        numeric value
+        text version }
+    READINESS_SNAPSHOTS { bigint id PK
+        uuid user_id FK
+        jsonb indicators
+        smallint ready_count
+        text rules_version }
+    CONSULTATION_REQUESTS { uuid id PK
+        uuid user_id FK
+        consult_channel channel
+        bool share_summary
+        jsonb summary
+        text reference_code }
+    NOTIFICATIONS { uuid id PK
+        uuid user_id FK
+        text kind
+        text title
+        text deep_link
+        timestamptz read_at }
+    REMINDER_SETTINGS { uuid user_id PK
+        reminder_kind kind PK
+        bool enabled
+        text schedule }
