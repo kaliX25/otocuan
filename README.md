@@ -59,6 +59,9 @@ npx expo start                          # tekan w untuk web, atau scan QR dengan
 
 ## Deploy ke Vercel (domain `otocuan.vercel.app`)
 
+Repo ini sudah tersambung ke project Vercel `otocuan`: setiap push ke `main` otomatis deploy ke production, branch lain jadi preview.
+
+
 1. Push folder ini ke repo GitHub baru, misalnya `otocuan`.
 2. Di vercel.com: **Add New > Project**, import repo, **Project Name: `otocuan`**. Framework preset: *Other*. Root directory: repo root (konfigurasi diambil dari `vercel.json`).
 3. Environment Variables (Production):
