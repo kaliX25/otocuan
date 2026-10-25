@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Image, Pressable, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { DATA_MODE, hasSession, sendOtp, verifyOtp } from '../api';
+import { DATA_MODE, sendOtp, signOut, verifyOtp } from '../api';
 import { useApp } from '../store';
 import { C, digits, num, rp } from '../theme';
 import { Btn, Card, Field, Header, Icon, IconBtn, Note, Row, Screen, Spacer, T, Toggle } from '../ui';
@@ -12,8 +12,8 @@ const ICON = require('../../assets/brand/app_icon.png');
 export function Splash() {
   const { nav, run } = useApp();
   useEffect(() => {
-    // Returning user (or magic-link sign-in): skip onboarding and load their own data.
-    hasSession().then(async (yes) => { if (yes && (await run((a) => a.state(0)))) nav.reset('home'); }).catch(() => {});
+    // Prototype mode: every visitor uses the on-device demo data, so drop any leftover sign-in session.
+    signOut().catch(() => {});
   }, []);
   return (
     <Pressable accessibilityRole="button" accessibilityLabel="Buka OTO CUAN" onPress={() => nav.reset('onboarding')} style={{ flex: 1, backgroundColor: '#E9F8FA', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
@@ -68,26 +68,25 @@ export function Login() {
   const [email, setEmail] = useState('');
   const [useEmail, setUseEmail] = useState(DATA_MODE === 'remote');
   const submit = async () => {
-    const target = useEmail ? { email: email.trim() } : { phone: '+62' + digits(phone) };
-    if (useEmail ? !/^\S+@\S+\.\S+$/.test(email.trim()) : String(digits(phone)).length < 9) { say(useEmail ? 'Email belum valid' : 'Nomor HP belum lengkap'); return; }
-    try { await sendOtp(target); nav.go('otp', { target }); say('Kode verifikasi terkirim'); } catch (e: any) { say(e.message); }
+    // Prototype: login and sign-up go straight into the demo (persona Steven), no OTP round trip.
+    await signOut().catch(() => {});
+    nav.go('consent');
   };
   return (
     <Screen white>
       <IconBtn name="back" label="Kembali" bg={C.chipBg} onPress={nav.back} />
       <Image source={ICON} style={{ width: 60, height: 60, marginTop: 8 }} />
       <T s={26} w="x">Masuk ke OTO CUAN</T>
-      <T s={14.5} lh={22} c={C.muted}>{useEmail ? 'Kami kirim kode 6 angka ke emailmu.' : 'Pakai nomor HP. Kami kirim kode verifikasi lewat SMS.'}</T>
+      <T s={14.5} lh={22} c={C.muted}>{useEmail ? 'Masuk atau daftar pakai email.' : 'Masuk atau daftar pakai nomor HP.'}</T>
       {useEmail ? <Field label="Email" value={email} onChangeText={setEmail} keyboardType="email-address" placeholder="nama@email.com" /> : (
         <Row style={{ alignItems: 'flex-end' }}>
           <View style={{ height: 50, borderRadius: 14, borderWidth: 1.5, borderColor: C.line, paddingHorizontal: 14, justifyContent: 'center' }}><T w="s">+62</T></View>
           <View style={{ flex: 1 }}><Field label="Nomor HP" value={phone} onChangeText={setPhone} keyboardType="phone-pad" /></View>
         </Row>
       )}
-      <Btn title="Kirim Kode Verifikasi" onPress={submit} disabled={busy} />
+      <Btn title="Masuk / Daftar" onPress={submit} disabled={busy} />
       <Row style={{ marginVertical: 4 }}><View style={{ flex: 1, height: 1, backgroundColor: C.line }} /><T s={12.5} c={C.muted}>atau</T><View style={{ flex: 1, height: 1, backgroundColor: C.line }} /></Row>
       <Btn v="plain" icon={useEmail ? undefined : 'mail'} title={useEmail ? 'Pakai nomor HP' : 'Lanjut dengan Email'} onPress={() => setUseEmail(!useEmail)} />
-      {DATA_MODE === 'remote' ? <Pressable onPress={() => nav.go('consent')} style={{ alignSelf: 'center', padding: 10 }}><T w="b" c={C.tealDark}>Coba demo tanpa akun</T></Pressable> : null}
       <Spacer />
       <Note tone="teal" icon="shield" text="Datamu dienkripsi. OTO CUAN tidak meminta PIN atau password rekening bankmu." />
     </Screen>
